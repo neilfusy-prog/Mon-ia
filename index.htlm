@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon IA</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #080b18;
+      color: white;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: #10162d;
+      border-bottom: 1px solid #29304f;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      color: #9da7d1;
+    }
+
+    #chat {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+
+    .message {
+      padding: 14px 16px;
+      margin: 12px 0;
+      border-radius: 15px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      background: #26315f;
+      margin-left: 15%;
+    }
+
+    .ai {
+      background: #151c35;
+      margin-right: 15%;
+    }
+
+    .bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      background: #080b18;
+      border-top: 1px solid #29304f;
+    }
+
+    .input-box {
+      max-width: 800px;
+      margin: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #39436d;
+      background: #11162a;
+      color: white;
+      outline: none;
+    }
+
+    button {
+      padding: 14px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #5865f2;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🤖 Mon IA</h1>
+  <p>Mon assistant personnel</p>
+</header>
+
+<div id="chat">
+  <div class="message ai">
+    👋 Salut ! Je suis ton IA. Pose-moi une question !
+  </div>
+</div>
+
+<div class="bottom">
+  <div class="input-box">
+    <input id="message" placeholder="Écris ta question..." autocomplete="off">
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
+</div>
+
+<script>
+function sendMessage() {
+  const input = document.getElementById("message");
+  const chat = document.getElementById("chat");
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user";
+  userMessage.textContent = text;
+  chat.appendChild(userMessage);
+
+  input.value = "";
+
+  const aiMessage = document.createElement("div");
+  aiMessage.className = "message ai";
+  aiMessage.textContent =
+    "🤖 Je suis encore en cours de création ! Mon cerveau IA sera ajouté à l'étape suivante.";
+  chat.appendChild(aiMessage);
+
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+document.getElementById("message").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
+</script>
+
+</body>
+</html>
