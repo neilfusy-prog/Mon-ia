@@ -1,9 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Mon IA</title>
+
+  <!-- Puter.js -->
+
+  <script src="https://js.puter.com/v2/"></script>
 
   <style>
     * {
@@ -31,6 +37,7 @@
     }
 
     header p {
+      margin: 8px 0 0;
       color: #9da7d1;
     }
 
@@ -59,6 +66,10 @@
       margin-right: 15%;
     }
 
+    .loading {
+      opacity: 0.7;
+    }
+
     .bottom {
       position: fixed;
       bottom: 0;
@@ -78,12 +89,14 @@
 
     input {
       flex: 1;
+      min-width: 0;
       padding: 14px;
       border-radius: 12px;
       border: 1px solid #39436d;
       background: #11162a;
       color: white;
       outline: none;
+      font-size: 16px;
     }
 
     button {
@@ -93,12 +106,28 @@
       background: #5865f2;
       color: white;
       font-weight: bold;
+      cursor: pointer;
     }
 
-    button:active {
-      transform: scale(0.97);
+    button:disabled {
+      opacity: 0.5;
+    }
+
+    @media (max-width: 600px) {
+      .user {
+        margin-left: 5%;
+      }
+
+      .ai {
+        margin-right: 5%;
+      }
+
+      button {
+        padding: 14px;
+      }
     }
   </style>
+
 </head>
 
 <body>
@@ -116,41 +145,106 @@
 
 <div class="bottom">
   <div class="input-box">
-    <input id="message" placeholder="Écris ta question..." autocomplete="off">
-    <button onclick="sendMessage()">Envoyer</button>
+    <input
+      id="message"
+      type="text"
+      placeholder="Écris ta question..."
+      autocomplete="off"
+    >
+
+```
+<button id="sendButton" onclick="sendMessage()">
+  Envoyer
+</button>
+```
+
   </div>
 </div>
 
 <script>
-function sendMessage() {
   const input = document.getElementById("message");
   const chat = document.getElementById("chat");
+  const sendButton = document.getElementById("sendButton");
 
-  const text = input.value.trim();
+  async function sendMessage() {
+    const text = input.value.trim();
 
-  if (!text) return;
+    if (!text || sendButton.disabled) {
+      return;
+    }
 
-  const userMessage = document.createElement("div");
-  userMessage.className = "message user";
-  userMessage.textContent = text;
-  chat.appendChild(userMessage);
+    // Message de l'utilisateur
+    const userMessage = document.createElement("div");
+    userMessage.className = "message user";
+    userMessage.textContent = text;
+    chat.appendChild(userMessage);
 
-  input.value = "";
+    input.value = "";
+    sendButton.disabled = true;
 
-  const aiMessage = document.createElement("div");
-  aiMessage.className = "message ai";
-  aiMessage.textContent =
-    "🤖 Je suis encore en cours de création ! Mon cerveau IA sera ajouté à l'étape suivante.";
-  chat.appendChild(aiMessage);
+    // Message temporaire de l'IA
+    const aiMessage = document.createElement("div");
+    aiMessage.className = "message ai loading";
+    aiMessage.textContent = "🤔 Je réfléchis...";
+    chat.appendChild(aiMessage);
 
-  window.scrollTo(0, document.body.scrollHeight);
-}
+    window.scrollTo(0, document.body.scrollHeight);
 
-document.getElementById("message").addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
-    sendMessage();
+    try {
+      const response = await puter.ai.chat(
+        [
+          {
+            role: "system",
+            content:
+              "Tu es une IA généraliste appelée Mon IA. " +
+              "Réponds toujours en français sauf si l'utilisateur demande une autre langue. " +
+              "Sois claire, utile et adaptée à un adolescent. " +
+              "Tu peux parler de sciences, technologie, jeux vidéo, école, créativité, " +
+              "astronomie et de nombreux autres sujets."
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ],
+        {
+          model: "gpt-5.4-nano"
+        }
+      );
+
+      let answer = "";
+
+      if (typeof response === "string") {
+        answer = response;
+      } else if (response?.message?.content) {
+        answer = response.message.content;
+      } else {
+        answer = JSON.stringify(response);
+      }
+
+      aiMessage.classList.remove("loading");
+      aiMessage.textContent = answer;
+
+    } catch (error) {
+      console.error(error);
+
+      aiMessage.classList.remove("loading");
+      aiMessage.textContent =
+        "❌ Je n'arrive pas à contacter le cerveau de l'IA. " +
+        "Réessaie dans quelques secondes.";
+    }
+
+    sendButton.disabled = false;
+    input.focus();
+
+    window.scrollTo(0, document.body.scrollHeight);
   }
-});
+
+  input.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
 </script>
 
 </body>
